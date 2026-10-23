@@ -3,10 +3,12 @@ import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 import 'package:sitevisits/presentation/theme/app_colors.dart';
 import 'package:sitevisits/presentation/theme/app_test.dart';
 
+import '../../core/utils/date_formatter.dart';
+
 class TaskCard extends StatefulWidget {
 bool isChecked ;
   final String title;
-  final String updateTime;
+  final DateTime updateTime;
   final String? status;
  TaskCard({super.key, this.isChecked= false, required this.title, required this.updateTime,this.status});
 
@@ -35,7 +37,7 @@ class _TaskCardState extends State<TaskCard> {
             children: [
               // check box ,
               Transform.scale(
-                scale: 1.3,
+                scale: 1.1,
                 child: Checkbox(
                   checkColor: AppColors.white,
                   activeColor: AppColors.success,
@@ -59,8 +61,9 @@ class _TaskCardState extends State<TaskCard> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  AppText(title: widget.title),
-                  AppText(title: widget.updateTime),
+                  AppText(title: widget.title, size: 16.sp,weight:FontWeight.bold),
+
+                  AppText(title:'Updated ${DateFormatter.visitUpdated(widget.updateTime)}' ,size: 12.sp,weight:FontWeight.normal),
                 ],
               ),
             ],

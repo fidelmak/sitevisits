@@ -88,17 +88,17 @@ class _AppSearchState extends State<AppSearch> {
                 horizontal: 12.sp,
               ),
               labelText: widget.hintText,
-              labelStyle: TextStyle(color: AppColors.searchHint, fontSize: 24.sp),
+              labelStyle: TextStyle(color: AppColors.searchHint, fontSize: 16.sp),
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16.r),
+                borderRadius: BorderRadius.circular(12.r),
                 borderSide: BorderSide(color: AppColors.searchHint),
               ),
               focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16.r),
+                borderRadius: BorderRadius.circular(12.r),
                 borderSide: BorderSide(color: AppColors.black),
               ),
               enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16.r),
+                borderRadius: BorderRadius.circular(12.r),
                 borderSide: BorderSide(color: AppColors.searchHint),
               ),
               prefixIcon: Container(
@@ -106,7 +106,7 @@ class _AppSearchState extends State<AppSearch> {
 
                 child: AppIconButton(
                   icon: CupertinoIcons.search,
-                  size: 24.sp,
+                  size: 16.sp,
                   color:  AppColors.searchHint,
                   onPressed: () {
                     _handleSearch(_textController.text);

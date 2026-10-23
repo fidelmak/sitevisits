@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 
+import '../bloc/task_bloc.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_search_bar.dart';
 import '../widgets/task_card.dart';
@@ -139,6 +141,13 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _isChecked = false;
 
   @override
+  void initState() {
+    super.initState();
+    debugPrint('initState: dispatching GetTask');
+    context.read<TaskBloc>().add(GetTask());
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -148,27 +157,55 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             AppSearch(
               hintText: 'Search visits',
-              onSearch: (query) {},
-              onClear: () {},
+              onSearch: (query) {
+
+              },
+              onClear: () {
+
+              },
             ),
             Expanded(
-              child: ListView.builder(
-                scrollDirection: Axis.vertical,
-                itemCount: tasks.length,
-                itemBuilder: (context, index) {
-                  final Map<String, String> task = tasks[index];
-                  return Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: TaskCard(
-                      title: task["title"].toString(),
-                      updateTime: task["updatedAt"].toString(),
-                      status: task["status"].toString(),
-                      isChecked: _isChecked,
-                    ),
-                  );
+              child: BlocConsumer<TaskBloc, TaskState>(
+                listener: (context, state) {
+                  if(state is TaskLoading){
+                    ScaffoldMessenger.of(
+                      context,
+                    ).showSnackBar(const SnackBar(content: Text('loading Tasks')));
+                  }
+                  if(state is TaskError){
+                    ScaffoldMessenger.of(
+                      context,
+                    ).showSnackBar(const SnackBar(content: Text('loading Error')));
+                  }
+
+                },
+                builder: (context, state) {
+                  if(state is TaskLoading){
+                    return CircularProgressIndicator();
+                  }
+                  if(state is TaskLoaded){
+                  return ListView.builder(
+                    scrollDirection: Axis.vertical,
+                    itemCount:state.tasks.items.length ?? 0,
+                    itemBuilder: (context, index) {
+                    //  final Map<String, String> task = tasks[index];
+                      final tasks = state.tasks.items[index];
+                      return Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: TaskCard(
+                          title:tasks.title, //task["title"].toString(),
+
+                          updateTime: tasks.updatedAt, //task["updatedAt"].toString(),
+                          status:tasks.status.toString(), //task["status"].toString(),
+                          isChecked: _isChecked,
+                        ),
+                      );
+                    },
+                  );}
+                  return const Center(child: Text('Something went wrong'));
                 },
               ),
-              ),
+            ),
           ],
         ),
       ),
