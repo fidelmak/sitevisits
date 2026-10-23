@@ -23,7 +23,9 @@ class TaskRepository {
     final moreTasks = await provider.loadMoreTasks(cursor, limit: limit);
     return moreTasks;
   }
-
+  Future<TaskApiModel> searchTasks(String query) async {
+    return await provider.getTasks(query: query, cursor: null);
+  }
   Future<TaskApiModel> refreshTask() async{
     final tasks = await provider.getTasks();
 

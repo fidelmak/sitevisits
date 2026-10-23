@@ -13,6 +13,14 @@ class LoadMoreTasks extends TaskEvent {
   @override
   List<Object?> get props => [];
 }
+class SearchTasks extends TaskEvent {
+  final String query;
+
+  const SearchTasks(this.query);
+
+  @override
+  List<Object?> get props => [query];
+}
 class UpdateTask extends TaskEvent {
  final  String id ;
  final Status status;

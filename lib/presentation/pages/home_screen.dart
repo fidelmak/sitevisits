@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 
-import '../../data/models/task_api_model.dart';
+
 import '../../domain/entity.dart';
 import '../bloc/task_bloc.dart';
 import '../theme/app_colors.dart';
@@ -49,8 +49,33 @@ class _HomeScreenState extends State<HomeScreen> {
     if (!_scrollController.hasClients) return false;
     final maxScroll = _scrollController.position.maxScrollExtent;
     final currentScroll = _scrollController.offset;
-    // Triggers when it hit 200 away from the bottom
+    // Triggers
     return currentScroll >= (maxScroll - 200);
+  }
+  Timer? _debounce;
+
+
+
+  void _onSearch(String query) {
+    // Cancel
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+
+    // Wait 400ms after the user stops typing before dispatching
+    _debounce = Timer(const Duration(milliseconds: 400), () {
+      final trimmed = query.trim();
+      if (trimmed.isEmpty) {
+        // Reset
+        context.read<TaskBloc>().add(GetTask());
+      } else {
+        context.read<TaskBloc>().add(SearchTasks(trimmed));
+      }
+    });
+  }
+
+  void _onClear() {
+    _debounce?.cancel();
+    // Reset
+    context.read<TaskBloc>().add(GetTask());
   }
 
   @override
@@ -62,8 +87,8 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             AppSearch(
               hintText: 'Search visits',
-              onSearch: (query) {},
-              onClear: () {},
+              onSearch: _onSearch,
+              onClear: _onClear,
             ),
             Expanded(
               child: BlocConsumer<TaskBloc, TaskState>(
@@ -86,7 +111,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
 
                 buildWhen: (previous, current) {
-                  // this  Prevents temporary status emissions from destroying the ListView
+                  // this  Prevents temporary status from destroying the ListView
                   return current is TaskLoaded ||
                       current is TaskLoading ||
                       current is TaskError;

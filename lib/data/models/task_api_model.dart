@@ -38,7 +38,19 @@ class Item {
     required this.status,
     required this.updatedAt,
   });
-
+  Item copyWith({
+    String? id,
+    String? title,
+    Status? status,
+    DateTime? updatedAt,
+  }) {
+    return Item(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      status: status ?? this.status,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
   factory Item.fromJson(Map<String, dynamic> json) => Item(
     id: json['id'] as String,
     title: (json['title'] as String?) ?? 'Untitled',

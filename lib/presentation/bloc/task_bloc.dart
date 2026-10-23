@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 
 
 import '../../data/models/task_api_model.dart';
@@ -26,7 +27,7 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
   FutureOr<void> _onGetTask(GetTask event, Emitter<TaskState> emit) async{
 
       emit(TaskLoading());
-      await Future<void>.delayed(const Duration(seconds: 2));
+
       try{
         final tasks = await repository.getTask();
         emit(TaskLoaded( tasks:tasks,));
@@ -36,18 +37,60 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
 
   }
 
-  FutureOr<void> _onUpdateTask(UpdateTask event, Emitter<TaskState> emit) async {
+  // FutureOr<void> _onUpdateTask(UpdateTask event, Emitter<TaskState> emit) async {
+  //
+  //   emit(TaskLoading());
+  //   try{
+  //    await repository.upDateTask(event.id, event.status);
+  //     add(GetTask());
+  //
+  //   }catch(e){
+  //     emit(TaskError(e.toString()));
+  //   }
+  //
+  // }
 
-    emit(TaskLoading());
-    try{
-     await repository.upDateTask(event.id, event.status);
-      add(GetTask());
+  FutureOr<void> _onUpdateTask(
+      UpdateTask event,
+      Emitter<TaskState> emit,
+      ) async {
+    final currentState = state;
+    if (currentState is! TaskLoaded) return;
 
-    }catch(e){
-      emit(TaskError(e.toString()));
+    final previousItems = currentState.tasks.items;
+
+    final updatedItems = previousItems.map((item) {
+      if (item.id == event.id) {
+        return item.copyWith(status: event.status);
+      }
+      return item;
+    }).toList();
+
+    final nextLoadedState = currentState.copyWith(
+      tasks: currentState.tasks.copyWith(items: updatedItems),
+    );
+
+    // 1. Immediately emit the updated list (optimistic UI)
+    emit(nextLoadedState);
+
+    // 2. Hit the network in the background
+    try {
+      final task = await repository.upDateTask(event.id, event.status);
+
+      // 3. Briefly fire TaskUpdated to trigger your SnackBar listener
+      emit(TaskUpdated(task));
+
+      //  IMMEDIATELY restore TaskLoaded state so the next tap isn't blocked
+      emit(nextLoadedState);
+    } catch (e) {
+      //  Revert back
+      emit(currentState.copyWith(
+        tasks: currentState.tasks.copyWith(items: previousItems),
+      ));
     }
-    
   }
+
+
   Future<void> _onRefreshTasks(
       RefreshTasks event,
       Emitter<TaskState> emit,
@@ -82,7 +125,7 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
       return;
     }
 
-    // Emit loading indicator for the pagination spinner
+    // Emit loading indicator
     emit(currentState.copyWith(isLoadingMore: true));
     await Future<void>.delayed(const Duration(seconds: 2));
     try {
