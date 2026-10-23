@@ -10,8 +10,12 @@ class GetTask extends TaskEvent {
 
 }
 class UpdateTask extends TaskEvent {
+ final  String id ;
+ final Status status;
+
+  const UpdateTask({required this.id, required this.status});
   @override
 
-  List<Object?> get props =>[];
+  List<Object?> get props =>[id,status];
 
 }

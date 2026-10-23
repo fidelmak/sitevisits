@@ -1,5 +1,6 @@
 
 
+import '../../domain/entity.dart';
 import '../datasource/task_datasource.dart';
 import '../models/task_api_model.dart';
 
@@ -12,6 +13,11 @@ class TaskRepository {
   Future<TaskApiModel> getTask() async {
     final tasks = await provider.getTasks();
     return tasks;
+  }
+
+  Future<Item> upDateTask(String id, Status status) async {
+    final updateTask = await provider.upDateTasks(id, status);
+    return updateTask;
   }
 
 

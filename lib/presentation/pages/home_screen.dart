@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 
+import '../../data/models/task_api_model.dart';
+import '../../domain/entity.dart';
 import '../bloc/task_bloc.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_search_bar.dart';
+import '../widgets/error_widgets.dart';
 import '../widgets/task_card.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -15,130 +18,10 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final List<Map<String, String>> tasks = [
-    {
-      "id": "task_1",
-      "title": "Site visit #1",
-      "status": "done",
-      "updatedAt": "2026-01-01T00:00:00.000Z",
-    },
-    {
-      "id": "task_2",
-      "title": "Site visit #2",
-      "status": "open",
-      "updatedAt": "2026-01-01T00:37:00.000Z",
-    },
-    {
-      "id": "task_3",
-      "title": "Site visit #3",
-      "status": "open",
-      "updatedAt": "2026-01-01T01:14:00.000Z",
-    },
-    {
-      "id": "task_4",
-      "title": "Site visit #4",
-      "status": "open",
-      "updatedAt": "2026-01-01T01:51:00.000Z",
-    },
-    {
-      "id": "task_5",
-      "title": "Site visit #5",
-      "status": "done",
-      "updatedAt": "2026-01-01T02:28:00.000Z",
-    },
-    {
-      "id": "task_6",
-      "title": "Site visit #6",
-      "status": "open",
-      "updatedAt": "2026-01-01T03:05:00.000Z",
-    },
-    {
-      "id": "task_7",
-      "title": "Site visit #7",
-      "status": "open",
-      "updatedAt": "2026-01-01T03:42:00.000Z",
-    },
-    {
-      "id": "task_8",
-      "title": "Site visit #8",
-      "status": "open",
-      "updatedAt": "2026-01-01T04:19:00.000Z",
-    },
-    {
-      "id": "task_9",
-      "title": "Site visit #9",
-      "status": "done",
-      "updatedAt": "2026-01-01T04:56:00.000Z",
-    },
-    {
-      "id": "task_10",
-      "title": "Site visit #10",
-      "status": "open",
-      "updatedAt": "2026-01-01T05:33:00.000Z",
-    },
-    {
-      "id": "task_11",
-      "title": "Site visit #11",
-      "status": "open",
-      "updatedAt": "2026-01-01T06:10:00.000Z",
-    },
-    {
-      "id": "task_12",
-      "title": "Site visit #12",
-      "status": "open",
-      "updatedAt": "2026-01-01T06:47:00.000Z",
-    },
-    {
-      "id": "task_13",
-      "title": "Site visit #13",
-      "status": "done",
-      "updatedAt": "2026-01-01T07:24:00.000Z",
-    },
-    {
-      "id": "task_14",
-      "title": "Site visit #14",
-      "status": "open",
-      "updatedAt": "2026-01-01T08:01:00.000Z",
-    },
-    {
-      "id": "task_15",
-      "title": "Site visit #15",
-      "status": "open",
-      "updatedAt": "2026-01-01T08:38:00.000Z",
-    },
-    {
-      "id": "task_16",
-      "title": "Site visit #16",
-      "status": "open",
-      "updatedAt": "2026-01-01T09:15:00.000Z",
-    },
-    {
-      "id": "task_17",
-      "title": "Site visit #17",
-      "status": "done",
-      "updatedAt": "2026-01-01T09:52:00.000Z",
-    },
-    {
-      "id": "task_18",
-      "title": "Site visit #18",
-      "status": "open",
-      "updatedAt": "2026-01-01T10:29:00.000Z",
-    },
-    {
-      "id": "task_19",
-      "title": "Site visit #19",
-      "status": "open",
-      "updatedAt": "2026-01-01T11:06:00.000Z",
-    },
-    {
-      "id": "task_20",
-      "title": "Site visit #20",
-      "status": "open",
-      "updatedAt": "2026-01-01T11:43:00.000Z",
-    },
-  ];
+  final ScrollController _scrollController = ScrollController();
 
-  bool _isChecked = false;
+
+  final bool _isChecked = false;
 
   @override
   void initState() {
@@ -172,6 +55,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       context,
                     ).showSnackBar(const SnackBar(content: Text('loading Tasks')));
                   }
+                  if(state is TaskUpdated){
+                    ScaffoldMessenger.of(
+                      context,
+                    ).showSnackBar(const SnackBar(content: Text('Task Updated')));
+                  }
                   if(state is TaskError){
                     ScaffoldMessenger.of(
                       context,
@@ -180,9 +68,21 @@ class _HomeScreenState extends State<HomeScreen> {
 
                 },
                 builder: (context, state) {
+
+
                   if(state is TaskLoading){
-                    return CircularProgressIndicator();
+                    return  Center(
+                      child: SizedBox(
+                        width: 50.r,
+                        height: 50.r,
+                        child: const CircularProgressIndicator(
+                          color: AppColors.checkboxOutline,
+                          strokeWidth: 2,
+                        ),
+                      ),
+                    );
                   }
+
                   if(state is TaskLoaded){
                   return ListView.builder(
                     scrollDirection: Axis.vertical,
@@ -197,12 +97,24 @@ class _HomeScreenState extends State<HomeScreen> {
 
                           updateTime: tasks.updatedAt, //task["updatedAt"].toString(),
                           status:tasks.status.toString(), //task["status"].toString(),
-                          isChecked: _isChecked,
+                          isChecked:  tasks.status == Status.open ? _isChecked : !_isChecked,
+                          update: () {
+                            debugPrint('1. tap: ${tasks.id}');
+                            if (tasks.status == Status.archived) return;
+                            context.read<TaskBloc>().add(UpdateTask(
+                              id: tasks.id,
+                              status: tasks.status == Status.done ? Status.open : Status.done,
+                            ));
+
+                          },
                         ),
                       );
                     },
                   );}
-                  return const Center(child: Text('Something went wrong'));
+                  return ErrorWidgets(onPress: () {
+
+                  context.read<TaskBloc>().add(GetTask());
+                  },);
                 },
               ),
             ),

@@ -20,6 +20,14 @@ final class TaskLoaded extends TaskState {
   @override
   List<Object> get props => [tasks];
 }
+final class TaskUpdated extends TaskState {
+  final Item task;
+
+  const TaskUpdated(this.task);
+
+  @override
+  List<Object> get props => [task];
+}
 final class TaskError extends TaskState {
   final String message;
 

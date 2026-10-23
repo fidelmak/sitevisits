@@ -7,10 +7,11 @@ import '../../core/utils/date_formatter.dart';
 
 class TaskCard extends StatefulWidget {
 bool isChecked ;
+final VoidCallback update;
   final String title;
   final DateTime updateTime;
   final String? status;
- TaskCard({super.key, this.isChecked= false, required this.title, required this.updateTime,this.status});
+ TaskCard({super.key, this.isChecked= false, required this.title, required this.updateTime,this.status, required this.update});
 
   @override
   State<TaskCard> createState() => _TaskCardState();
@@ -54,6 +55,8 @@ class _TaskCardState extends State<TaskCard> {
                     setState(() {
                       widget.isChecked = newValue ?? false;
                     });
+                    widget.update();
+
                   },
                 ),
               ),
