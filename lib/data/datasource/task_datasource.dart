@@ -21,6 +21,30 @@ class TaskDatasource {
     }
 
   }
+  Future<TaskApiModel> loadMoreTasks(int cursor, {int limit = 20}) async {
+
+    final uri = Uri.parse(_baseUrl).replace(
+      queryParameters: {
+        'cursor': cursor.toString(),
+        'limit': limit.toString(),
+      },
+    );
+
+    final response = await client.get(
+      uri,
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final json = jsonDecode(response.body) as Map<String, dynamic>;
+      return TaskApiModel.fromJson(json);
+    } else {
+      throw Exception('Failed to fetch tasks: ${response.statusCode} - ${response.body}');
+    }
+  }
 
   // update  task
   Future<Item> upDateTasks (String id, Status status) async {
@@ -37,4 +61,6 @@ class TaskDatasource {
     }
 
   }
+
+
 }

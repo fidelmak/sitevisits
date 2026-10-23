@@ -12,13 +12,31 @@ final class TaskLoading extends TaskState {
   @override
   List<Object> get props => [];
 }
-final class TaskLoaded extends TaskState {
+class TaskLoaded extends TaskState {
   final TaskApiModel tasks;
+  final bool hasReachedMax;
+  final bool isLoadingMore;
 
-  const TaskLoaded(this.tasks);
+  TaskLoaded({
+    required this.tasks,
+    this.hasReachedMax = false,
+    this.isLoadingMore = false,
+  });
+
+  TaskLoaded copyWith({
+    TaskApiModel? tasks,
+    bool? hasReachedMax,
+    bool? isLoadingMore,
+  }) {
+    return TaskLoaded(
+      tasks: tasks ?? this.tasks,
+      hasReachedMax: hasReachedMax ?? this.hasReachedMax,
+      isLoadingMore: isLoadingMore ?? this.isLoadingMore,
+    );
+  }
 
   @override
-  List<Object> get props => [tasks];
+  List<Object?> get props => [tasks, hasReachedMax, isLoadingMore];
 }
 final class TaskUpdated extends TaskState {
   final Item task;

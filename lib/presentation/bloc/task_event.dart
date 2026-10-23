@@ -9,6 +9,10 @@ class GetTask extends TaskEvent {
   List<Object?> get props =>[];
 
 }
+class LoadMoreTasks extends TaskEvent {
+  @override
+  List<Object?> get props => [];
+}
 class UpdateTask extends TaskEvent {
  final  String id ;
  final Status status;
@@ -18,4 +22,13 @@ class UpdateTask extends TaskEvent {
 
   List<Object?> get props =>[id,status];
 
+}
+
+class RefreshTasks extends TaskEvent {
+  final Completer<void>? completer;
+
+  const RefreshTasks({this.completer});
+
+  @override
+  List<Object?> get props => [completer];
 }

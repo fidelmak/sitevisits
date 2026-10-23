@@ -1,19 +1,31 @@
 import '../../domain/entity.dart';
-
 class TaskApiModel {
   final List<Item> items;
-  final String? nextCursor;   // nullable: null means no more pages
+  final String? nextCursor; // nullable: null means no more pages
 
-  TaskApiModel({required this.items, required this.nextCursor});
+  TaskApiModel({
+    required this.items,
+    this.nextCursor,
+  });
 
   factory TaskApiModel.fromJson(Map<String, dynamic> json) => TaskApiModel(
-    items: (json['items'] as List)
-        .map((x) => Item.fromJson(x as Map<String, dynamic>))
-        .toList(),
+    items: (json['items'] as List<dynamic>?)
+        ?.map((x) => Item.fromJson(x as Map<String, dynamic>))
+        .toList() ??
+        [],
     nextCursor: json['nextCursor'] as String?,
   );
-}
 
+  TaskApiModel copyWith({
+    List<Item>? items,
+    String? nextCursor,
+  }) {
+    return TaskApiModel(
+      items: items ?? this.items,
+      nextCursor: nextCursor ?? this.nextCursor,
+    );
+  }
+}
 class Item {
   final String id;
   final String title;

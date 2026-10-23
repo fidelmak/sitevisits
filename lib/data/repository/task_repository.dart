@@ -19,7 +19,10 @@ class TaskRepository {
     final updateTask = await provider.upDateTasks(id, status);
     return updateTask;
   }
-
+  Future<TaskApiModel> loadMoreTask(int cursor, {int limit = 20}) async {
+    final moreTasks = await provider.loadMoreTasks(cursor, limit: limit);
+    return moreTasks;
+  }
 
   Future<TaskApiModel> refreshTask() async{
     final tasks = await provider.getTasks();

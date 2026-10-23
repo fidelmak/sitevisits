@@ -18,6 +18,8 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
   TaskBloc({required this.repository}) : super(TaskInitial()) {
     on<GetTask>(_onGetTask);
     on<UpdateTask>(_onUpdateTask);
+    on<LoadMoreTasks>(_onLoadMoreTask);
+    on<RefreshTasks>(_onRefreshTasks);
 
   }
 
@@ -27,7 +29,7 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
       await Future<void>.delayed(const Duration(seconds: 2));
       try{
         final tasks = await repository.getTask();
-        emit(TaskLoaded(tasks));
+        emit(TaskLoaded( tasks:tasks,));
       } catch (e) {
         emit(TaskError(e.toString()));
       }
@@ -45,5 +47,76 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
       emit(TaskError(e.toString()));
     }
     
+  }
+  Future<void> _onRefreshTasks(
+      RefreshTasks event,
+      Emitter<TaskState> emit,
+      ) async {
+    try {
+      // Re-fetch the very first batch (cursor 0 or initial load)
+      final freshTasks = await repository.loadMoreTask(0);
+
+      emit(TaskLoaded(
+        tasks: freshTasks,
+        hasReachedMax: freshTasks.nextCursor == null,
+        isLoadingMore: false,
+      ));
+    } catch (e) {
+
+    } finally {
+
+      event.completer?.complete();
+    }
+  }
+
+  Future<void> _onLoadMoreTask(
+      LoadMoreTasks event,
+      Emitter<TaskState> emit,
+      ) async {
+    final currentState = state;
+
+
+    if (currentState is! TaskLoaded ||
+        currentState.hasReachedMax ||
+        currentState.isLoadingMore) {
+      return;
+    }
+
+    // Emit loading indicator for the pagination spinner
+    emit(currentState.copyWith(isLoadingMore: true));
+    await Future<void>.delayed(const Duration(seconds: 2));
+    try {
+
+      final cursor = currentState.tasks.items.length;
+
+
+      final newPageData = await repository.loadMoreTask(cursor);
+
+      final newItems = newPageData.items ?? [];
+
+      if (newItems.isEmpty) {
+        // No more data to fetch
+        emit(currentState.copyWith(
+          hasReachedMax: true,
+          isLoadingMore: false,
+        ));
+      } else {
+
+        final combinedItems = List.of(currentState.tasks.items)..addAll(newItems);
+
+
+        final updatedTaskModel = currentState.tasks.copyWith(items: combinedItems);
+
+        emit(currentState.copyWith(
+          tasks: updatedTaskModel,
+          hasReachedMax: newItems.length < 20,
+          isLoadingMore: false,
+        ));
+      }
+    } catch (e) {
+
+
+      emit(currentState.copyWith(isLoadingMore: false));
+    }
   }
 }
