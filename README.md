@@ -41,7 +41,7 @@ A robust Flutter application for managing and tracking site visits, featuring of
 
 1. **Clone the Repository**:
    ```bash
-   git clone <repository-url>
+   git clone <[repository-url](https://github.com/fidelmak/sitevisits.git)>
    cd sitevisits
    ```
 
