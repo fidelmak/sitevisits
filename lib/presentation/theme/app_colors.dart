@@ -7,6 +7,9 @@ class AppColors {
   static const Color background = Color(0xFFFFFFFF);
   static const Color headerBackground = Color(0xFFF3F5F7);
 
+  static const Color bermuda = Color(0xFF7DD9C3);
+  static const Color darkSlate = Color(0xFF101828);
+
   // Text
   static const Color textPrimary = Color(0xFF1B2430);
   static const Color textSecondary = Color(0xFF6B7280);

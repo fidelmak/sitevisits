@@ -1,7 +1,8 @@
 import '../../domain/entity.dart';
+
 class TaskApiModel {
   final List<Item> items;
-  final String? nextCursor; // nullable: null means no more pages
+  final String? nextCursor;
 
   TaskApiModel({
     required this.items,
@@ -16,6 +17,11 @@ class TaskApiModel {
     nextCursor: json['nextCursor'] as String?,
   );
 
+  Map<String, dynamic> toJson() => {
+    'items': items.map((x) => x.toJson()).toList(),
+    if (nextCursor != null) 'nextCursor': nextCursor,
+  };
+
   TaskApiModel copyWith({
     List<Item>? items,
     String? nextCursor,
@@ -26,35 +32,52 @@ class TaskApiModel {
     );
   }
 }
+
 class Item {
   final String id;
   final String title;
   final Status status;
   final DateTime updatedAt;
+  final String? syncStatus; // 'pending',
 
   Item({
     required this.id,
     required this.title,
     required this.status,
     required this.updatedAt,
+    this.syncStatus,
   });
+
   Item copyWith({
     String? id,
     String? title,
     Status? status,
     DateTime? updatedAt,
+    String? syncStatus,
+    bool clearSyncStatus = false,
   }) {
     return Item(
       id: id ?? this.id,
       title: title ?? this.title,
       status: status ?? this.status,
       updatedAt: updatedAt ?? this.updatedAt,
+      syncStatus: clearSyncStatus ? null : (syncStatus ?? this.syncStatus),
     );
   }
+
   factory Item.fromJson(Map<String, dynamic> json) => Item(
     id: json['id'] as String,
     title: (json['title'] as String?) ?? 'Untitled',
     status: Status.fromApi(json['status'] as String?),
     updatedAt: DateTime.parse(json['updatedAt'] as String),
+    syncStatus: json['syncStatus'] as String?,
   );
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'title': title,
+    'status': status.name,
+    'updatedAt': updatedAt.toIso8601String(),
+    if (syncStatus != null) 'syncStatus': syncStatus,
+  };
 }

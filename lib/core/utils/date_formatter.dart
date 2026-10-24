@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 class DateFormatter {
   DateFormatter._();
 
-  // "1 Jan, 01:00" (matches your screenshot)
+  // for example  "1 Jan, 01:00"
   static const String visitPattern = 'd MMM, HH:mm';
 
   static String visitUpdated(DateTime date) =>
