@@ -1,10 +1,11 @@
+import 'package:equatable/equatable.dart';
 import '../../domain/entity.dart';
 
-class TaskApiModel {
+class TaskApiModel extends Equatable {
   final List<Item> items;
   final String? nextCursor;
 
-  TaskApiModel({
+  const TaskApiModel({
     required this.items,
     this.nextCursor,
   });
@@ -31,16 +32,19 @@ class TaskApiModel {
       nextCursor: nextCursor ?? this.nextCursor,
     );
   }
+
+  @override
+  List<Object?> get props => [items, nextCursor];
 }
 
-class Item {
+class Item extends Equatable {
   final String id;
   final String title;
   final Status status;
   final DateTime updatedAt;
-  final String? syncStatus; // 'pending',
+  final String? syncStatus;
 
-  Item({
+  const Item({
     required this.id,
     required this.title,
     required this.status,
@@ -80,4 +84,7 @@ class Item {
     'updatedAt': updatedAt.toIso8601String(),
     if (syncStatus != null) 'syncStatus': syncStatus,
   };
+
+  @override
+  List<Object?> get props => [id, title, status, updatedAt, syncStatus];
 }
