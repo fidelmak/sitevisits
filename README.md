@@ -1,5 +1,8 @@
 # Site Visits App
 
+# download the apk here 
+([ download the apk for android ](https://drive.google.com/file/d/1MvjiHfBPXvPp6ydXIW2CcWONjKPMYOls/view?usp=sharing) )
+
 A robust Flutter application for managing and tracking site visits, featuring offline local caching with `SharedPreferences`, optimistic UI updates, error state handling with custom SnackBars, dynamic unsynced task tracking, and search functionality integrated with `FlakyTaskApi`.
 
 ---
